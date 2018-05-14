@@ -1,18 +1,17 @@
 import requests
 import ConnectException
 import json
+import os
 from APIException import APIException
 
-private_ckan_user = ""
-private_ckan_key = ""
+private_ckan_user = os.getenv('PRIVATE_CKAN_ADMIN', 'user')
+private_ckan_key = os.getenv('PRIVATE_CKAN_KEY','api_key')
 
-public_ckan_user = ""
-public_ckan_key = ""
+public_ckan_user = os.getenv('PUBLIC_CKAN_ADMIN', 'user')
+public_ckan_key = os.getenv('PUBLIC_CKAN_KEY','api_key')
 
-
-
-private_ckan_url = "http://inia.linkeddata.es/"
-public_ckan_url = "http://public-inia.lab.oeg-upm.net/"
+private_ckan_url = os.getenv('PRIVATE_API_URL','url')
+public_ckan_url = os.getenv('PUBLIC_API_URL','url')
 
 class APIConnection:
 
