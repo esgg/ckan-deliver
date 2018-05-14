@@ -22,7 +22,7 @@ class CkanPackage():
             return self.api.check_package(id)
         except APIException as apiex:
             logging.error(apiex)
-            raise PackageException("Problem to get package " + str(id))
+            return False
 
     def update(self,id, package):
         self.api.update_package(id,package)
