@@ -8,6 +8,7 @@ from CkanPackage import CkanPackage
 from CkanOrganization import CkanOrganization
 import logging.config
 from datetime import datetime
+from PackageException import PackageException
 
 
 logging.config.fileConfig('config/logging.cfg')
@@ -17,7 +18,9 @@ public_ckan_url = "http://public-inia.lab.oeg-upm.net/"
 
 basic_action_url = "api/action/"
 
-private_key = os.getenv("PRIVATE_KEY_CKAN","")
+private_key = os.getenv('PRIVATE_API_URL','url')
+timer = os.getenv('TIMER_IN_SEC','60')
+
 
 def get_date():
     return "2017-11-09"
@@ -98,13 +101,16 @@ fileid = open(pidfile,"r+")
 
 if os.path.exists(pidfile):
     time_mark = fileid.read()
+    logging.info("Load timestamp:"+str(time_mark))
 
 def task():
+    global time_mark
     logging.info("Get last revisions from "+str(time_mark))
     status, revisions = get_last_revisions(time_mark)
 
     logging.info("Get list of packages ids")
     list_packages = get_packages(revisions)
+    logging.debug(list_packages);
 
 
     #list_packages = ["test12"]
@@ -141,16 +147,20 @@ def task():
             else:
                 package_public.write_package(json_dump)
 
+            logging.info("Package created/updated on public CKAN")
+
             fileid.seek(0)
             fileid.write(metadata_modified)
 
-            logging.info("Package created/updated on public CKAN")
+            time_mark = metadata_modified
 
-        except CkanPackage as cpex:
-            logging.error(cpex + "on package "+package_id)
+            logging.info("Timestamp updated to "+metadata_modified)
+
+        except PackageException as cpex:
+            logging.error(str(cpex) + "on package "+str(package_id))
 
     logging.info("Waiting until next execution")
-    threading.Timer(60, task).start()
+    threading.Timer(int(timer), task).start()
 
 task()
 
