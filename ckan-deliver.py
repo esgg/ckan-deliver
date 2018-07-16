@@ -140,14 +140,17 @@ def task():
 
             json_dump = package_private.get_package()
             #print json.dumps(json_dump, indent=4, sort_keys=True)
-
-            package_public = CkanPackage("public_ckan")
-            if package_public.exists_package(package_id):
-                package_public.update(package_id,json_dump)
+	    
+            if json_dump["licencia_abierta"]=="si":	
+               package_public = CkanPackage("public_ckan")
+               if package_public.exists_package(package_id):
+                  package_public.update(package_id,json_dump)
+               else:
+                  package_public.write_package(json_dump)
+            
+               logging.info("Package created/updated on public CKAN")
             else:
-                package_public.write_package(json_dump)
-
-            logging.info("Package created/updated on public CKAN")
+               logging.info("No open license") 
 
             fileid.seek(0)
             fileid.write(metadata_modified)
